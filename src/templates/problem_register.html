@@ -2,21 +2,42 @@
 <html lang="ja">
     <head>
         <meta charset="utf-8">
-        <title>list</title>
+        <title>問題登録画面</title>
+        <link rel="stylesheet" href="./static/css/pr_style.css">
     </head>
+    <header>
+        <div>
+            <h1>paize実行アプリ</h1>
+        </div>
+        <div>
+            <a href="{{ url_for('index') }}">プログラム実行画面へ</a>
+        </div>
+    </header>
     <body>
-        <form action="http://127.0.0.1:5000/create" method="get">
-            <div>
-                <label for="name">名前</label>
-                <input type="text" name="name">
-            </div>
-            <div>
-                <label for="age">年齢</label>
-                <input type="text" name="age">
-            </div>
-            <div>
-                <input type="submit" value="登録">
-            </div>
-        </form>
+        <div>
+            <main>
+                <form action="http://127.0.0.1:5000/problem" method="post">
+                    <div>
+                        <label for="name">タイトル名</label>
+                        <input type="text" name="title_name">
+                    </div>
+                    <div>
+                        <label for="age">問題名</label>
+                        <input type="text" name="problem_name">
+                    </div>
+                    <div>
+                        <label for="age">入力値</label>
+                        <input type="text" name="input_data">
+                    </div>
+                    <div>
+                        <label for="age">期待する出力</label>
+                        <input type="text" name="expect_output_data">
+                    </div>
+                    <div class="submit">
+                        <input type="submit" value="登録">
+                    </div>
+                </form>
+            </main>
+        </div>
     </body>
 </html>
