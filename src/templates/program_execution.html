@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <title>プログラム実行画面</title>
+        <link rel="stylesheet" href="./static/css/pe_style.css">
+        <script src="./static/js/program_execution.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script>
+            // プログラム実行（非同期）
+            $(function() {
+                $('button#exec').bind('click', function() {
+                    var id = $('input[id="b_problem_id"]').val()
+                    var status = $('input[id="b_status"]').val()
+
+                    if(id == "") {
+                        window.alert("問題を選択してください。");
+                    }
+                    else if(status == "CLEAR") {
+                        window.alert("既にクリアした問題です。");
+                    }
+                    else {
+                        $.getJSON('/result', {
+                            id: $('input[id="b_problem_id"]').val(),
+                            input: $('input[id="b_input"]').val(),
+                            output: $('input[id="b_output"]').val()
+                        }, function(data) {
+                            $("#result").text(data.result)
+                            $("#code_output").text(data.code_output)
+                        });
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <header>
+            <div>
+                <h1>paize実行アプリ</h1>
+            </div>
+            <div>
+                <a href="{{ url_for('move') }}" >問題登録画面へ</a>
+            </div>
+        </header>
+        <div>
+            <nav>
+                <div class="title">
+                    {% for title in screen_data %}
+                    <details>
+                        <summary>{{ title.name }}</summary>
+                        <div class="problems">
+                            {% for problem in title.problems %}
+                            <div class="problem" id="{{ problem.id }}">
+                                <p>{{ problem.name }} : {{ problem.status }}</p>
+                                <input type="hidden" name="input" value="{{ problem.input_data }}">
+                                <input type="hidden" name="output" value="{{ problem.expect_output_data }}">
+                                <input type="hidden" name="status" value="{{ problem.status }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    {% endfor %}
+                </div>
+            </nav>
+            <main>
+                <table>
+                    <tr class="input">
+                        <th>入力値</th>
+                        <td id="input"></td>
+                    </tr>
+                    <tr class="expect">
+                        <th>期待する出力</th>
+                        <td id="expect"></td>
+                    </tr>
+                    <tr class="output">
+                        <th>コード<br>アウトプット</th>
+                        <td id="code_output"></td>
+                    </tr>
+                    <tr class="result">
+                        <th>判定</th>
+                        <td id="result"></td>
+                    </tr>
+                </table>
+                <div id="button-area">
+                    <button id="exec">実行</button>
+                    <input type="hidden" id="b_problem_id" value="">
+                    <input type="hidden" id="b_input" value="">
+                    <input type="hidden" id="b_output" value="">
+                    <input type="hidden" id="b_status" value="">
+                </div>
+            </main>
+        </div>
+        <footer></footer>
+    </body>
+</html>

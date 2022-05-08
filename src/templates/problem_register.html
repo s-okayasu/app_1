@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>問題登録画面</title>
+        <link rel="stylesheet" href="./static/css/pr_style.css">
+        <script src="./static/js/problem_regist.js"></script>
+        <script>
+            
+        </script>
+    </head>
+    <header>
+        <div>
+            <h1>paize実行アプリ</h1>
+        </div>
+        <div>
+            <a href="{{ url_for('index') }}">プログラム実行画面へ</a>
+        </div>
+    </header>
+    <body>
+        <div>
+            <main>
+                <form id="form">
+                    {% if is_regist %}
+                    <p>{{ message }}</p>
+                    {% endif %}
+                    <div>
+                        <label for="title_name">タイトル名</label>
+                        <input type="text" name="title_name" id="title_name">
+                    </div>
+                    <div>
+                        <label for="problem_name">問題名</label>
+                        <input type="text" name="problem_name" id="problem_name">
+                    </div>
+                    <div>
+                        <label for="input_data">入力値</label>
+                        <input type="text" name="input_data" id="input_data">
+                    </div>
+                    <div>
+                        <label for="expect_output_data">期待する出力</label>
+                        <input type="text" name="expect_output_data" id="expect_output_data">
+                    </div>
+                    <div class="submit">
+                        <button id="btn">登録</button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </body>
+</html>
