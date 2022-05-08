@@ -41,8 +41,11 @@ table th {
 tr.input {
     height: 10%;
 }
+tr.expect {
+    height: 10%;
+}
 tr.output {
-    height: 80%;
+    height: 70%;
 }
 tr.output td {
     background-color: rgb(238, 230, 230);
@@ -64,7 +67,7 @@ footer {
         order: -1;
     }
 }
-.button-area {
+#button-area {
     background-color: white;
     border-left: 1px solid;
     border-right: 1px solid;
@@ -72,7 +75,7 @@ footer {
     height: 50px;
     justify-content: center;
 }
-input {
+button {
     width: 120px;
     height: 50px;
 }
@@ -82,4 +85,10 @@ input {
 }
 summary {
     border-style: double;
+}
+.title {
+    display: block;
+}
+.problems {
+    display: block;
 }

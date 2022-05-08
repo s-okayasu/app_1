@@ -4,6 +4,10 @@
         <meta charset="utf-8">
         <title>問題登録画面</title>
         <link rel="stylesheet" href="./static/css/pr_style.css">
+        <script src="./static/js/problem_regist.js"></script>
+        <script>
+            
+        </script>
     </head>
     <header>
         <div>
@@ -16,25 +20,28 @@
     <body>
         <div>
             <main>
-                <form action="http://127.0.0.1:5000/problem" method="post">
+                <form id="form">
+                    {% if is_regist %}
+                    <p>{{ message }}</p>
+                    {% endif %}
                     <div>
-                        <label for="name">タイトル名</label>
-                        <input type="text" name="title_name">
+                        <label for="title_name">タイトル名</label>
+                        <input type="text" name="title_name" id="title_name">
                     </div>
                     <div>
-                        <label for="age">問題名</label>
-                        <input type="text" name="problem_name">
+                        <label for="problem_name">問題名</label>
+                        <input type="text" name="problem_name" id="problem_name">
                     </div>
                     <div>
-                        <label for="age">入力値</label>
-                        <input type="text" name="input_data">
+                        <label for="input_data">入力値</label>
+                        <input type="text" name="input_data" id="input_data">
                     </div>
                     <div>
-                        <label for="age">期待する出力</label>
-                        <input type="text" name="expect_output_data">
+                        <label for="expect_output_data">期待する出力</label>
+                        <input type="text" name="expect_output_data" id="expect_output_data">
                     </div>
                     <div class="submit">
-                        <input type="submit" value="登録">
+                        <button id="btn">登録</button>
                     </div>
                 </form>
             </main>

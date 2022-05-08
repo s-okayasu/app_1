@@ -1,8 +1,9 @@
-import string
 from flask import Flask, jsonify, redirect, render_template, request, url_for
-import os
 from flask_sqlalchemy import SQLAlchemy
+import os
+import shutil
 from query import Query
+from execute_program import execute
 
 app = Flask(__name__)
 base_dir = os.path.dirname(__file__)
@@ -35,43 +36,90 @@ class Problems(db.Model):
 
 @app.route('/')
 def index():
-    # 画面表示用のデータを設定
-    screen_data = []
-    titles = query.select_all(Titles)
-    problems = query.select_all(Problems)
-    for t_data in titles:
-        title = {'id': t_data.id, 'name': t_data.name, 'problems': []}
-        for p_data in problems:
-            if t_data.id == p_data.title_id:
-                problem = {'id': p_data.id, 'name': p_data.name, 'status': p_data.status, 'input_data': p_data.input_data,
-                    'expect_output_data': p_data.expect_output_data}
-                title['problems'].append(problem)
-        screen_data.append(title)
+    try:
+        # 画面表示用のデータを設定
+        screen_data = []
+        titles = query.select_all(Titles)
+        problems = query.select_all(Problems)
+        for t_data in titles:
+            title = {'id': t_data.id, 'name': t_data.name, 'problems': []}
+            for p_data in problems:
+                status = ''
+                if p_data.status == '1':
+                    status = 'CLEAR'
+                if t_data.id == p_data.title_id:
+                    problem = {'id': p_data.id, 'name': p_data.name, 'status': status, 
+                    'input_data': p_data.input_data, 'expect_output_data': p_data.expect_output_data}
+                    title['problems'].append(problem)
+            screen_data.append(title)
+    except Exception as ex:
+        print(ex)
     return render_template('program_execution.html', screen_data=screen_data)
 
 @app.route('/problem_register')
 def move():
     return render_template('problem_register.html')
 
+@app.route('/result')
+def get():
+    try:
+        id = request.args.get('id', '', type=int)
+        expect_output = request.args.get('output', '', type=str)
+        input_str = request.args.get('input', '', type=str)
+        print('info log : id=' + str(id))
+        print('info log : input=' + input_str)
+        print('info log : expect_output=' + expect_output)
+        # プログラム実行
+        input_list = input_str.split(' ')
+        output = execute.exec(input_list)
+        result = 'False'
+        if output == expect_output:
+            result = 'True'
+            # statusを更新
+            query.update_status(Problems, id)
+            # ファイル移動
+            shutil.move('./execute_program/execute.py', './clear_problems/')
+            os.rename('./clear_problems/execute.py', './clear_problems/problemId_' + str(id) + '.py')
+            shutil.copy('./execute_program/template_file/template.py', './execute_program/')
+            os.rename('./execute_program/template.py', './execute_program/execute.py')
+    except Exception as ex:
+        print(ex)
+    return jsonify({'result': result, 'code_output': output})
+
 @app.route('/problem', methods=['POST'])
 def regist():
-    # 入力されたtitleがDBに存在するか判定
-    # 存在しない場合は追加
-    title_name = request.form.get('title_name')
-    result = query.select_title(Titles, title_name)
-    if len(result) == 0:
-        query.insert(Titles(title_name))
-    # problemを追加
-    title_id = query.select_title(Titles, title_name)[0].id
-    print(str(title_id))
-    problems = Problems(
-        title_id,
-        request.form.get('problem_name'),
-        request.form.get('input_data'),
-        request.form.get('expect_output_data'),
-        '0'
-    )
-    query.insert(problems)
+    try:
+        title_name = request.form.get('title_name')
+        problem_name = request.form.get('problem_name')
+        input_data = request.form.get('input_data')
+        expect_output_data = request.form.get('expect_output_data')
+        print('info log : problem_name=' + title_name)
+        print('info log : problem_name=' + problem_name)
+        print('info log : input_data=' + input_data)
+        print('info log : expect_output_data=' + expect_output_data)
+        # 入力されたtitleとproblemがDBに存在するか判定
+        # 両方が同時に存在する場合は追加しない
+        title = query.select_title(Titles, 'name', title_name)
+        problem = query.select_title(Titles, 'name', problem_name)
+        if len(title) > 0 and len(problem) > 0:
+            return render_template('problem_register.html', is_regist=True, message='既に登録済みです。')
+        if len(title) == 0:
+            # titleを追加
+            query.insert_recode(Titles(title_name))
+        if len(problem) == 0:
+            print('problem')
+            # problemを追加
+            title_id = query.select_title(Titles, 'name', title_name)[0].id
+            problems = Problems(
+                title_id,
+                request.form.get('problem_name'),
+                request.form.get('input_data'),
+                request.form.get('expect_output_data'),
+                '0'
+            )
+            query.insert_recode(problems)
+    except Exception as ex:
+        print(ex)
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
